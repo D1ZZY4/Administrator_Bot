@@ -72,10 +72,10 @@ def handle_report_button(call):
 
                 # Kirimkan format laporan ke admin
                 caption = (
-                    f"⚠️ LAPORAN ({report_type.upper()})\n\n"
-                    f"ID Pengguna: {user_id}\n"
-                    f"Username Pengguna: @{username}\n"
-                    f"Nama Grup: {chat_name}\n"
+                    f"⚠️ Laporan Baru ({report_type.upper()})\n\n"
+                    f"ID: {user_id}\n"
+                    f"Username: @{username}\n"
+                    f"Dari Grup: {chat_name}\n"
                 )
                 markup = types.InlineKeyboardMarkup()
                 markup.add(
@@ -86,32 +86,32 @@ def handle_report_button(call):
                 bot.send_message(ADMIN_ID, caption, reply_markup=markup)
                 
                 # Ganti tombol dengan pesan laporan diterima
-                bot.edit_message_text("Laporan diterima. Saya akan mengirimkan informasi ini kepada admin.",
+                bot.edit_message_text("Laporan diterima. Saya akan mengirimkan informasi ini kepada Admin.",
                                       chat_id=call.message.chat.id,
                                       message_id=call.message.message_id)
             else:
-                bot.send_message(call.message.chat.id, "Terjadi kesalahan dalam memproses laporan dari grup. Silakan coba lagi.")
+                bot.send_message(call.message.chat.id, "Terjadi kesalahan dalam memproses laporan dari grup. Silakan coba lagi nanti.")
         
         elif report_source == 'private':
             bot.answer_callback_query(call.id)
-            bot.edit_message_text("Kirimkan bukti berupa photo atau link chat", 
+            bot.edit_message_text("Kirimkan bukti berupa foto / video / username / id / link chat", 
                                   chat_id=call.message.chat.id, 
                                   message_id=call.message.message_id)
             bot.register_next_step_handler(call.message, process_evidence, report_type=report_type)
     
     except Exception as e:
         print(f"Error handling report button: {e}")
-        bot.send_message(call.message.chat.id, "Terjadi kesalahan dalam memproses laporan. Silakan coba lagi.")
+        bot.send_message(call.message.chat.id, "Terjadi kesalahan dalam memproses laporan. Silakan coba lagi nanti.")
 
 def process_evidence(message, report_type):
     try:
         chat_id = message.chat.id
 
         if message.photo:
-            caption = f"Laporan {report_type.upper()}:\n\nBukti:\n{message.caption if message.caption else 'Tidak ada caption'}"
+            caption = f"Laporan {report_type.upper()}:\n\nBukti:\n{message.caption if message.caption else 'Tidak ada pesan'}"
             bot.send_photo(ADMIN_ID, message.photo[-1].file_id, caption=caption)
         elif message.video:
-            caption = f"Laporan {report_type.upper()}:\n\nBukti:\n{message.caption if message.caption else 'Tidak ada caption'}"
+            caption = f"Laporan {report_type.upper()}:\n\nBukti:\n{message.caption if message.caption else 'Tidak ada pesan'}"
             bot.send_video(ADMIN_ID, message.video.file_id, caption=caption)
         elif message.text:
             caption = f"Laporan {report_type.upper()}:\n\nBukti:\n{message.text}"
@@ -124,7 +124,7 @@ def process_evidence(message, report_type):
     
     except Exception as e:
         print(f"Error processing evidence: {e}")
-        bot.send_message(message.chat.id, "Terjadi kesalahan dalam memproses bukti. Silakan coba lagi.")
+        bot.send_message(message.chat.id, "Terjadi kesalahan dalam memproses bukti. Silakan coba lagi nanti.")
 
 @bot.callback_query_handler(func=lambda call: call.data.startswith('check_ban_'))
 def handle_check_ban(call):
@@ -154,7 +154,7 @@ def handle_check_ban(call):
 
     except Exception as e:
         print(f"Error handling check ban callback: {e}")
-        bot.send_message(call.message.chat.id, "Terjadi kesalahan dalam memeriksa status pemblokiran. Silakan coba lagi.")
+        bot.send_message(call.message.chat.id, "Terjadi kesalahan dalam memeriksa status pemblokiran. Silakan coba lagi nanti.")
 
 def search_message_in_channel(user_id, username):
     return None
