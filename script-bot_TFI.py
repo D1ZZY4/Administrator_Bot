@@ -72,10 +72,10 @@ def handle_report_button(call):
 
                 # Kirimkan format laporan ke admin
                 caption = (
-                    f"⚠️ Laporan Baru ({report_type.upper()})\n\n"
+                    f"Laporan Baru⚠️ ({report_type.upper()})\n\n"
                     f"ID: {user_id}\n"
                     f"Username: @{username}\n"
-                    f"Dari Grup: {chat_name}\n"
+                    f"Pada Grup: {chat_name}\n"
                 )
                 markup = types.InlineKeyboardMarkup()
                 markup.add(
@@ -108,16 +108,16 @@ def process_evidence(message, report_type):
         chat_id = message.chat.id
 
         if message.photo:
-            caption = f"Laporan {report_type.upper()}:\n\nBukti:\n{message.caption if message.caption else 'Tidak ada pesan'}"
+            caption = f"Laporan {report_type.upper()}:\n\nPesan:\n{message.caption if message.caption else 'Tidak ada pesan yang dikirim'}"
             bot.send_photo(ADMIN_ID, message.photo[-1].file_id, caption=caption)
         elif message.video:
-            caption = f"Laporan {report_type.upper()}:\n\nBukti:\n{message.caption if message.caption else 'Tidak ada pesan'}"
+            caption = f"Laporan {report_type.upper()}:\n\nPesan:\n{message.caption if message.caption else 'Tidak ada pesan yang dikirim'}"
             bot.send_video(ADMIN_ID, message.video.file_id, caption=caption)
         elif message.text:
-            caption = f"Laporan {report_type.upper()}:\n\nBukti:\n{message.text}"
+            caption = f"Laporan {report_type.upper()}:\n\nPesan:\n{message.text}"
             bot.send_message(ADMIN_ID, caption)
         else:
-            bot.send_message(ADMIN_ID, f"Laporan {report_type.upper()}:\n\nTidak ada bukti yang dilampirkan.")
+            bot.send_message(ADMIN_ID, f"Laporan Baru⚠️ {report_type.upper()}:\n\nTidak ada bukti yang dilampirkan.")
 
         bot.send_message(chat_id, "Laporan diterima. Saya akan mengirimkan informasi ini ke Admin.")
         bot.delete_message(chat_id=chat_id, message_id=message.message_id - 1) # Delete the "kirimkan bukti" message
