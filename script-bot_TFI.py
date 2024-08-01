@@ -18,7 +18,7 @@ def send_welcome(message):
             markup.add(types.InlineKeyboardButton("Log-Fban", url="https://t.me/LogTranssionIndonesia"))
             markup.add(types.InlineKeyboardButton("UnFban-Support", url="https://t.me/FederationTranssionIndonesia"))
             bot.send_message(message.chat.id, 
-                             "👋 Halo dan Salam Kenal! 👋\n\n"
+                             " Halo dan Salam Kenal! 👋\n\n"
                              "Saya adalah Administrator dari Federasi Transsion Indonesia (TFI).\n\n"
                              "• Untuk melaporkan pelanggaran, gunakan perintah /report.\n\n"
                              "• Untuk aju banding Fban, gunakan perintah /appeal.\n\n"
