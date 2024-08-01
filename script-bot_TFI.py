@@ -18,14 +18,14 @@ def send_welcome(message):
             markup.add(types.InlineKeyboardButton("Log-Fban", url="https://t.me/LogTranssionIndonesia"))
             markup.add(types.InlineKeyboardButton("UnFban-Support", url="https://t.me/FederationTranssionIndonesia"))
             bot.send_message(message.chat.id, 
-                                              "<b>👋 Halo dan Salam Kenal! 👋</b>\n\n"
-                 "<b>Saya adalah Administrator dari Federasi Transsion Indonesia (TFI).</b>\n\n"
-                 "• <i>Untuk melaporkan pelanggaran, gunakan perintah /report.</i>\n\n"
-                 "• <i>Untuk aju banding Fban, gunakan perintah /appeal.</i>\n\n"
-                 "• <i>Jika Anda belum mengetahui aturan, klik tombol \"Rules\" di bawah ini.</i>\n\n"
-                 "• <i>Untuk memeriksa status ban Anda, klik tombol \"Log Fban\".</i>\n\n"
-                 "• <i>Jika Anda membutuhkan dukungan atau ingin bergabung dalam grup, klik tombol \"UnFban Support\".</i>", 
-                             reply_markup=markup)
+                             "<b>👋 Halo dan Salam Kenal! 👋</b>\n\n"
+                             "<b>Saya adalah Administrator dari Federasi Transsion Indonesia (TFI).</b>\n\n"
+                             "• <b>Untuk melaporkan pelanggaran, gunakan perintah <i>/report.</i></b>\n\n"
+                             "• <b>Untuk aju banding Fban, gunakan perintah <i>/appeal.</i></b>\n\n"
+                             "• <b>Jika Anda belum mengetahui aturan, klik tombol <i>\"Rules\" di bawah ini.</i></b>\n\n"
+                             "• <b>Untuk memeriksa status ban Anda, klik tombol <i>\"Log Fban\".</i></b>\n\n"
+                             "• <b>Jika Anda membutuhkan dukungan atau ingin bergabung dalam grup, klik tombol <i>\"UnFban Support\".</i></b>", 
+                             reply_markup=markup, parse_mode='HTML')
     except Exception as e:
         print(f"Error in /start command: {e}")
 
@@ -213,25 +213,10 @@ def handle_buttons(call):
             markup.add(types.InlineKeyboardButton("Back to Menu", callback_data='back_to_start'))
             bot.edit_message_text(rules_text, chat_id=call.message.chat.id, message_id=call.message.message_id, reply_markup=markup, parse_mode='HTML')
         elif call.data == 'back_to_start':
-            bot.edit_message_text(
-                                 "<b>👋 Halo dan Salam Kenal! 👋</b>\n\n"
-                 "<b>Saya adalah Administrator dari Federasi Transsion Indonesia (TFI).</b>\n\n"
-                 "• <i>Untuk melaporkan pelanggaran, gunakan perintah /report.</i>\n\n"
-                 "• <i>Untuk aju banding Fban, gunakan perintah /appeal.</i>\n\n"
-                 "• <i>Jika Anda belum mengetahui aturan, klik tombol \"Rules\" di bawah ini.</i>\n\n"
-                 "• <i>Untuk memeriksa status ban Anda, klik tombol \"Log Fban\".</i>\n\n"
-                 "• <i>Jika Anda membutuhkan dukungan atau ingin bergabung dalam grup, klik tombol \"UnFban Support\".</i>", 
-                chat_id=call.message.chat.id, 
-                message_id=call.message.message_id,
-                reply_markup=types.InlineKeyboardMarkup().add(
-                    types.InlineKeyboardButton("Rules", callback_data='rules_menu'),
-                    types.InlineKeyboardButton("Log-Fban", url="https://t.me/LogTranssionIndonesia"),
-                    types.InlineKeyboardButton("UnFban-Support", url="https://t.me/FederationTranssionIndonesia")
-                )
-            )
+            send_welcome(call.message)
 
     except Exception as e:
         print(f"Error handling buttons: {e}")
-        bot.send_message(call.message.chat.id, "Terjadi kesalahan. Silakan coba lagi.")
 
-bot.polling(none_stop=True)
+if __name__ == '__main__':
+    bot.polling(none_stop=True)
