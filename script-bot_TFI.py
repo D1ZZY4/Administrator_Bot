@@ -18,7 +18,13 @@ def send_welcome(message):
             markup.add(types.InlineKeyboardButton("Log-Fban", url="https://t.me/LogTranssionIndonesia"))
             markup.add(types.InlineKeyboardButton("UnFban-Support", url="https://t.me/FederationTranssionIndonesia"))
             bot.send_message(message.chat.id, 
-                             "Salam kenal! Saya administrator dari TFI. Jika Anda belum mengetahui aturan dari TFI, silakan klik tombol Rules di bawah.", 
+                                              "<b>👋 Halo dan Salam Kenal! 👋</b>\n\n"
+                 "<b>Saya adalah Administrator dari Federasi Transsion Indonesia (TFI).</b>\n\n"
+                 "• <i>Untuk melaporkan pelanggaran, gunakan perintah /report.</i>\n\n"
+                 "• <i>Untuk aju banding Fban, gunakan perintah /appeal.</i>\n\n"
+                 "• <i>Jika Anda belum mengetahui aturan, klik tombol \"Rules\" di bawah ini.</i>\n\n"
+                 "• <i>Untuk memeriksa status ban Anda, klik tombol \"Log Fban\".</i>\n\n"
+                 "• <i>Jika Anda membutuhkan dukungan atau ingin bergabung dalam grup, klik tombol \"UnFban Support\".</i>", 
                              reply_markup=markup)
     except Exception as e:
         print(f"Error in /start command: {e}")
@@ -84,21 +90,21 @@ def handle_report_button(call):
                                                else f"https://t.me/c/{chat_id}/{message_id}")
                 )
                 bot.send_message(ADMIN_ID, caption, reply_markup=markup)
-                
+
                 # Ganti tombol dengan pesan laporan diterima
                 bot.edit_message_text("Laporan diterima. Saya akan mengirimkan informasi ini kepada Admin.",
                                       chat_id=call.message.chat.id,
                                       message_id=call.message.message_id)
             else:
                 bot.send_message(call.message.chat.id, "Terjadi kesalahan dalam memproses laporan dari grup. Silakan coba lagi nanti.")
-        
+
         elif report_source == 'private':
             bot.answer_callback_query(call.id)
             bot.edit_message_text("Kirimkan bukti berupa foto / video / username / id / link chat", 
                                   chat_id=call.message.chat.id, 
                                   message_id=call.message.message_id)
             bot.register_next_step_handler(call.message, process_evidence, report_type=report_type)
-    
+
     except Exception as e:
         print(f"Error handling report button: {e}")
         bot.send_message(call.message.chat.id, "Terjadi kesalahan dalam memproses laporan. Silakan coba lagi nanti.")
@@ -121,7 +127,7 @@ def process_evidence(message, report_type):
 
         bot.send_message(chat_id, "Laporan diterima. Saya akan mengirimkan informasi ini ke Admin.")
         bot.delete_message(chat_id=chat_id, message_id=message.message_id - 1) # Delete the "kirimkan bukti" message
-    
+
     except Exception as e:
         print(f"Error processing evidence: {e}")
         bot.send_message(message.chat.id, "Terjadi kesalahan dalam memproses bukti. Silakan coba lagi nanti.")
@@ -208,7 +214,13 @@ def handle_buttons(call):
             bot.edit_message_text(rules_text, chat_id=call.message.chat.id, message_id=call.message.message_id, reply_markup=markup, parse_mode='HTML')
         elif call.data == 'back_to_start':
             bot.edit_message_text(
-                "Salam kenal! Saya administrator dari TFI. Jika Anda belum mengetahui aturan dari TFI, silakan klik tombol Rules di bawah.", 
+                                 "<b>👋 Halo dan Salam Kenal! 👋</b>\n\n"
+                 "<b>Saya adalah Administrator dari Federasi Transsion Indonesia (TFI).</b>\n\n"
+                 "• <i>Untuk melaporkan pelanggaran, gunakan perintah /report.</i>\n\n"
+                 "• <i>Untuk aju banding Fban, gunakan perintah /appeal.</i>\n\n"
+                 "• <i>Jika Anda belum mengetahui aturan, klik tombol \"Rules\" di bawah ini.</i>\n\n"
+                 "• <i>Untuk memeriksa status ban Anda, klik tombol \"Log Fban\".</i>\n\n"
+                 "• <i>Jika Anda membutuhkan dukungan atau ingin bergabung dalam grup, klik tombol \"UnFban Support\".</i>", 
                 chat_id=call.message.chat.id, 
                 message_id=call.message.message_id,
                 reply_markup=types.InlineKeyboardMarkup().add(
