@@ -17,17 +17,20 @@ def send_welcome(message):
             markup.add(types.InlineKeyboardButton("Rules", callback_data='rules_menu'))
             markup.add(types.InlineKeyboardButton("Log-Fban", url="https://t.me/LogTranssionIndonesia"))
             markup.add(types.InlineKeyboardButton("UnFban-Support", url="https://t.me/FederationTranssionIndonesia"))
-            bot.send_message(message.chat.id, 
-                             " Halo dan Salam Kenal! 👋\n\n"
-                             "Saya adalah Administrator dari Federasi Transsion Indonesia (TFI).\n\n"
-                             "• Untuk melaporkan pelanggaran, gunakan perintah /report.\n\n"
-                             "• Untuk aju banding Fban, gunakan perintah /appeal.\n\n"
-                             "• Jika Anda belum mengetahui aturan, klik tombol \"Rules\" di bawah ini.\n\n"
-                             "• Untuk memeriksa status ban Anda, klik tombol "Log Fban\".\n\n"
-                             "• Jika Anda membutuhkan dukungan atau ingin bergabung dalam grup, klik tombol \"UnFban Support\", 
-                             reply_markup=markup, parse_mode='HTML')
-    except Exception as e:
-        print(f"Error in /start command: {e}")
+            bot.send_message(
+        message.chat.id, 
+        "Halo dan Salam Kenal! 👋\n\n"
+        "Saya adalah Administrator dari Federasi Transsion Indonesia (TFI).\n\n"
+        "• Untuk melaporkan pelanggaran, gunakan perintah /report.\n\n"
+        "• Untuk aju banding Fban, gunakan perintah /appeal.\n\n"
+        "• Jika Anda belum mengetahui aturan, klik tombol \"Rules\" di bawah ini.\n\n"
+        "• Untuk memeriksa status ban Anda, klik tombol \"Log Fban\".\n\n"
+        "• Jika Anda membutuhkan dukungan atau ingin bergabung dalam grup, klik tombol \"UnFban Support\".", 
+        reply_markup=markup, 
+        parse_mode='HTML'
+    )
+except Exception as e:
+    print(f"Error in /start command: {e}")
 
 @bot.message_handler(commands=['report'], func=lambda message: message.chat.type == 'private')
 def handle_private_report(message):
