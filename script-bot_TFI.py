@@ -17,18 +17,15 @@ def send_welcome(message):
             markup.add(types.InlineKeyboardButton("Rules", callback_data='rules_menu'))
             markup.add(types.InlineKeyboardButton("Log-Fban", url="https://t.me/LogTranssionIndonesia"))
             markup.add(types.InlineKeyboardButton("UnFban-Support", url="https://t.me/FederationTranssionIndonesia"))
-            bot.send_message(
-                message.chat.id, 
-                "Halo dan Salam Kenal! 👋\n\n"
-                "Saya adalah Administrator dari Federasi Transsion Indonesia (TFI).\n\n"
-                "• Untuk melaporkan pelanggaran, gunakan perintah /report.\n\n"
-                "• Untuk aju banding Fban, gunakan perintah /appeal.\n\n"
-                "• Jika Anda belum mengetahui aturan, klik tombol \"Rules\" di bawah ini.\n\n"
-                "• Untuk memeriksa status ban Anda, klik tombol \"Log-Fban\".\n\n"
-                "• Jika Anda membutuhkan dukungan atau ingin bergabung dalam grup, klik tombol \"UnFban-Support\".", 
-                reply_markup=markup, 
-                parse_mode='HTML'
-            )
+            bot.send_message(message.chat.id, 
+                             "Halo dan Salam Kenal! 👋\n\n"
+        "Saya adalah Administrator dari Federasi Transsion Indonesia (TFI).\n\n"
+        "• Untuk melaporkan pelanggaran, gunakan perintah /report.\n\n"
+        "• Untuk aju banding Fban, gunakan perintah /appeal.\n\n"
+        "• Jika Anda belum mengetahui aturan, klik tombol \"Rules\" di bawah ini.\n\n"
+        "• Untuk memeriksa status ban Anda, klik tombol \"Log Fban\".\n\n"
+        "• Jika Anda membutuhkan dukungan atau ingin bergabung dalam grup, klik tombol \"UnFban Support\".", 
+                             reply_markup=markup)
     except Exception as e:
         print(f"Error in /start command: {e}")
 
@@ -47,15 +44,16 @@ def handle_private_report(message):
 @bot.message_handler(func=lambda message: message.chat.type in ['group', 'supergroup'] and '/report' in message.text.lower())
 def handle_group_report(message):
     try:
-        if message.reply_to_message:
-            markup = types.InlineKeyboardMarkup()
-            markup.add(
-                types.InlineKeyboardButton("Cheat", callback_data=f'report_cheat_group_{message.reply_to_message.message_id}'),
-                types.InlineKeyboardButton("Scam", callback_data=f'report_scam_group_{message.reply_to_message.message_id}')
-            )
-            bot.send_message(message.chat.id, "Silakan pilih jenis laporan:", reply_markup=markup)
-        else:
-            bot.send_message(message.chat.id, "Harap reply ke pesan yang ingin Anda laporkan.")
+        if message.chat.type in ['group', 'supergroup']:
+            if message.reply_to_message:
+                markup = types.InlineKeyboardMarkup()
+                markup.add(
+                    types.InlineKeyboardButton("Cheat", callback_data=f'report_cheat_group_{message.reply_to_message.message_id}'),
+                    types.InlineKeyboardButton("Scam", callback_data=f'report_scam_group_{message.reply_to_message.message_id}')
+                )
+                bot.send_message(message.chat.id, "Silakan pilih jenis laporan:", reply_markup=markup)
+            else:
+                bot.send_message(message.chat.id, "Harap reply ke pesan yang ingin Anda laporkan.")
     except Exception as e:
         print(f"Error in /report command (group): {e}")
 
@@ -128,7 +126,7 @@ def process_evidence(message, report_type):
             bot.send_message(ADMIN_ID, f"Laporan Baru⚠️ {report_type.upper()}:\n\nTidak ada bukti yang dilampirkan.")
 
         bot.send_message(chat_id, "Laporan diterima. Saya akan mengirimkan informasi ini ke Admin.")
-        bot.delete_message(chat_id=chat_id, message_id=message.message_id - 1)  # Delete the "kirimkan bukti" message
+        bot.delete_message(chat_id=chat_id, message_id=message.message_id - 1) # Delete the "kirimkan bukti" message
 
     except Exception as e:
         print(f"Error processing evidence: {e}")
@@ -165,7 +163,6 @@ def handle_check_ban(call):
         bot.send_message(call.message.chat.id, "Terjadi kesalahan dalam memeriksa status pemblokiran. Silakan coba lagi nanti.")
 
 def search_message_in_channel(user_id, username):
-    # Dummy function for searching the message in the channel log
     return None
 
 @bot.callback_query_handler(func=lambda call: call.data in ['rules_menu', 'back_to_start'])
@@ -175,7 +172,7 @@ def handle_buttons(call):
             rules_text = (
                 "<b><u>📜 Aturan Umum:</u></b>\n\n"
                 "1. <b>Konten Negatif:</b> Dilarang menyebar rasisme, provokasi, atau konten negatif. <i>Tindakan:</i> <i>Ban.</i>\n\n"
-                "2. <b>Konten Dewasa:</b> Dilarang membagikan konten 18+ termasuk link, foto, video, dan lain-lain. <i>Tindakan:</i> <i>Ban.</i>\n\n"
+                "2. <b>Konten Dewasa:</b> Dilarang membagikan konten 18+ termasuk link, foto, video, dan stiker. <i>Tindakan:</i> <i>Ban.</i>\n\n"
                 "3. <b>Promosi Judi:</b> Tidak boleh mempromosikan judi. <i>Tindakan:</i> <i>Ban.</i>\n\n"
                 "4. <b>Jasa Scam:</b> Dilarang mempromosikan jasa scam. <i>Tindakan:</i> <i>Ban.</i>\n\n"
                 "5. <b>Promosi Togel:</b> Dilarang membagikan informasi togel. <i>Tindakan:</i> <i>Ban.</i>\n\n"
@@ -216,10 +213,25 @@ def handle_buttons(call):
             markup.add(types.InlineKeyboardButton("Back to Menu", callback_data='back_to_start'))
             bot.edit_message_text(rules_text, chat_id=call.message.chat.id, message_id=call.message.message_id, reply_markup=markup, parse_mode='HTML')
         elif call.data == 'back_to_start':
-            send_welcome(call.message)
+            bot.edit_message_text(
+                "Halo dan Salam Kenal! 👋\n\n"
+        "Saya adalah Administrator dari Federasi Transsion Indonesia (TFI).\n\n"
+        "• Untuk melaporkan pelanggaran, gunakan perintah /report.\n\n"
+        "• Untuk aju banding Fban, gunakan perintah /appeal.\n\n"
+        "• Jika Anda belum mengetahui aturan, klik tombol \"Rules\" di bawah ini.\n\n"
+        "• Untuk memeriksa status ban Anda, klik tombol \"Log Fban\".\n\n"
+        "• Jika Anda membutuhkan dukungan atau ingin bergabung dalam grup, klik tombol \"UnFban Support\".", 
+                chat_id=call.message.chat.id, 
+                message_id=call.message.message_id,
+                reply_markup=types.InlineKeyboardMarkup().add(
+                    types.InlineKeyboardButton("Rules", callback_data='rules_menu'),
+                    types.InlineKeyboardButton("Log-Fban", url="https://t.me/LogTranssionIndonesia"),
+                    types.InlineKeyboardButton("UnFban-Support", url="https://t.me/FederationTranssionIndonesia")
+                )
+            )
 
     except Exception as e:
         print(f"Error handling buttons: {e}")
+        bot.send_message(call.message.chat.id, "Terjadi kesalahan. Silakan coba lagi.")
 
-if __name__ == '__main__':
-    bot.polling(none_stop=True)
+bot.polling(none_stop=True)
