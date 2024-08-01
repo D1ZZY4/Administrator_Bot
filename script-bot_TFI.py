@@ -18,13 +18,13 @@ def send_welcome(message):
             markup.add(types.InlineKeyboardButton("Log-Fban", url="https://t.me/LogTranssionIndonesia"))
             markup.add(types.InlineKeyboardButton("UnFban-Support", url="https://t.me/FederationTranssionIndonesia"))
             bot.send_message(message.chat.id, 
-                             "<b>👋 Halo dan Salam Kenal! 👋</b>\n\n"
-                             "<b>Saya adalah Administrator dari Federasi Transsion Indonesia (TFI).</b>\n\n"
-                             "• <b>Untuk melaporkan pelanggaran, gunakan perintah <i>/report.</i></b>\n\n"
-                             "• <b>Untuk aju banding Fban, gunakan perintah <i>/appeal.</i></b>\n\n"
-                             "• <b>Jika Anda belum mengetahui aturan, klik tombol <i>\"Rules\" di bawah ini.</i></b>\n\n"
-                             "• <b>Untuk memeriksa status ban Anda, klik tombol <i>\"Log Fban\".</i></b>\n\n"
-                             "• <b>Jika Anda membutuhkan dukungan atau ingin bergabung dalam grup, klik tombol <i>\"UnFban Support\".</i></b>", 
+                             "👋 Halo dan Salam Kenal! 👋\n\n"
+                             "Saya adalah Administrator dari Federasi Transsion Indonesia (TFI).\n\n"
+                             "• Untuk melaporkan pelanggaran, gunakan perintah /report.\n\n"
+                             "• Untuk aju banding Fban, gunakan perintah /appeal.\n\n"
+                             "• Jika Anda belum mengetahui aturan, klik tombol \"Rules\" di bawah ini.\n\n"
+                             "• Untuk memeriksa status ban Anda, klik tombol "Log Fban\".\n\n"
+                             "• Jika Anda membutuhkan dukungan atau ingin bergabung dalam grup, klik tombol \"UnFban Support\", 
                              reply_markup=markup, parse_mode='HTML')
     except Exception as e:
         print(f"Error in /start command: {e}")
