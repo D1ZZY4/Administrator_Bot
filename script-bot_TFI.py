@@ -6,7 +6,7 @@ BOT_TOKEN = '7141227909:AAFGsTOp8bPbXzBJXaPq9FEdwg3CuNSmCUY'
 bot = telebot.TeleBot(BOT_TOKEN)
 
 # Mendefinisikan ID admin dan channel log
-ADMIN_ID = 5991733650
+ADMIN_IDS = [5991733650, 1274879104, 6499966648, 1077734345]
 LOG_CHANNEL = '@LogTranssionIndonesia'
 
 @bot.message_handler(commands=['start'])
@@ -17,15 +17,18 @@ def send_welcome(message):
             markup.add(types.InlineKeyboardButton("Rules", callback_data='rules_menu'))
             markup.add(types.InlineKeyboardButton("Log-Fban", url="https://t.me/LogTranssionIndonesia"))
             markup.add(types.InlineKeyboardButton("UnFban-Support", url="https://t.me/FederationTranssionIndonesia"))
-            bot.send_message(message.chat.id, 
-                             "Halo dan Salam Kenal! 👋\n\n"
-        "Saya adalah Administrator dari Federasi Transsion Indonesia (TFI).\n\n"
-        "• Untuk melaporkan pelanggaran, gunakan perintah /report.\n\n"
-        "• Untuk aju banding Fban, gunakan perintah /appeal.\n\n"
-        "• Jika Anda belum mengetahui aturan, klik tombol \"Rules\" di bawah ini.\n\n"
-        "• Untuk memeriksa status ban Anda, klik tombol \"Log Fban\".\n\n"
-        "• Jika Anda membutuhkan dukungan atau ingin bergabung dalam grup, klik tombol \"UnFban Support\".", 
-                             reply_markup=markup)
+            bot.send_message(
+                message.chat.id,
+                "<b><i>Halo dan Salam Kenal! 👋</i></b>\n\n"
+                "<i>Saya adalah Administrator dari Federasi Transsion Indonesia (TFI).</i>\n\n"
+                "• <i>Untuk melaporkan pelanggaran, gunakan perintah</i> <b><i>/report</i></b>.\n\n"
+                "• <i>Untuk aju banding Fban, gunakan perintah</i> <b><i>/appeal</i></b>.\n\n"
+                "• <i>Jika Anda belum mengetahui aturan, klik tombol</i> <b><i>\"Rules\"</i></b> <i>di bawah ini.</i>\n\n"
+                "• <i>Untuk memeriksa status ban Anda, klik tombol</i> <b><i>\"Log Fban\"</i></b>.\n\n"
+                "• <i>Jika Anda membutuhkan dukungan atau ingin bergabung dalam grup, klik tombol</i> <b><i>\"UnFban Support\"</i></b>.",
+                parse_mode='HTML',
+                reply_markup=markup
+            )
     except Exception as e:
         print(f"Error in /start command: {e}")
 
@@ -34,8 +37,12 @@ def handle_private_report(message):
     try:
         markup = types.InlineKeyboardMarkup()
         markup.add(
-            types.InlineKeyboardButton("Cheat", callback_data='report_cheat_private'),
-            types.InlineKeyboardButton("Scam", callback_data='report_scam_private')
+            types.InlineKeyboardButton("Spam", callback_data='report_spam_private'),
+            types.InlineKeyboardButton("Scam", callback_data='report_scam_private'),
+            types.InlineKeyboardButton("porn", callback_data='report_porn_private'),
+            types.InlineKeyboardButton("rasis", callback_data='report_rasisme_private'),
+            types.InlineKeyboardButton("rusuh", callback_data='report_rusuh_private'),
+            types.InlineKeyboardButton("cheat", callback_data='report_cheat_private')
         )
         bot.send_message(message.chat.id, "Silakan pilih jenis laporan:", reply_markup=markup)
     except Exception as e:
@@ -44,16 +51,19 @@ def handle_private_report(message):
 @bot.message_handler(func=lambda message: message.chat.type in ['group', 'supergroup'] and '/report' in message.text.lower())
 def handle_group_report(message):
     try:
-        if message.chat.type in ['group', 'supergroup']:
-            if message.reply_to_message:
-                markup = types.InlineKeyboardMarkup()
-                markup.add(
-                    types.InlineKeyboardButton("Cheat", callback_data=f'report_cheat_group_{message.reply_to_message.message_id}'),
-                    types.InlineKeyboardButton("Scam", callback_data=f'report_scam_group_{message.reply_to_message.message_id}')
-                )
-                bot.send_message(message.chat.id, "Silakan pilih jenis laporan:", reply_markup=markup)
-            else:
-                bot.send_message(message.chat.id, "Harap reply ke pesan yang ingin Anda laporkan.")
+        if message.reply_to_message:
+            markup = types.InlineKeyboardMarkup()
+            markup.add(
+                types.InlineKeyboardButton("spam", callback_data=f'report_spam_group_{message.reply_to_message.message_id}'),
+                types.InlineKeyboardButton("scam", callback_data=f'report_scam_group_{message.reply_to_message.message_id}'),
+                types.InlineKeyboardButton("porn", callback_data=f'report_porn_group_{message.reply_to_message.message_id}'),
+                types.InlineKeyboardButton("rasis", callback_data=f'report_rasisme_group_{message.reply_to_message.message_id}'),
+                types.InlineKeyboardButton("rusuh", callback_data=f'report_rusuh_group_{message.reply_to_message.message_id}'),
+                types.InlineKeyboardButton("cheat", callback_data=f'report_cheat_group_{message.reply_to_message.message_id}')
+            )
+            bot.send_message(message.chat.id, "Silakan pilih jenis laporan:", reply_markup=markup)
+        else:
+            bot.send_message(message.chat.id, "Harap reply ke pesan yang ingin Anda laporkan.")
     except Exception as e:
         print(f"Error in /report command (group): {e}")
 
@@ -89,8 +99,12 @@ def handle_report_button(call):
                                                url=f"https://t.me/{call.message.chat.username}/{message_id}" if call.message.chat.username 
                                                else f"https://t.me/c/{chat_id}/{message_id}")
                 )
-                bot.send_message(ADMIN_ID, caption, reply_markup=markup)
-
+                for admin_id in ADMIN_IDS:
+                    try:
+                        bot.send_message(admin_id, caption, reply_markup=markup)
+                    except Exception as e:
+                        print(f"Error sending report to admin {admin_id}: {e}")
+                
                 # Ganti tombol dengan pesan laporan diterima
                 bot.edit_message_text("Laporan diterima. Saya akan mengirimkan informasi ini kepada Admin.",
                                       chat_id=call.message.chat.id,
@@ -107,132 +121,29 @@ def handle_report_button(call):
 
     except Exception as e:
         print(f"Error handling report button: {e}")
-import telebot
-from telebot import types
-
-# Token bot Anda
-BOT_TOKEN = '7141227909:AAFGsTOp8bPbXzBJXaPq9FEdwg3CuNSmCUY'
-bot = telebot.TeleBot(BOT_TOKEN)
-
-# Mendefinisikan ID admin dan channel log
-ADMIN_ID = 5991733650
-LOG_CHANNEL = '@LogTranssionIndonesia'
-
-@bot.message_handler(commands=['start'])
-def send_welcome(message):
-    try:
-        if message.chat.type == 'private':
-            markup = types.InlineKeyboardMarkup()
-            markup.add(types.InlineKeyboardButton("Rules", callback_data='rules_menu'))
-            markup.add(types.InlineKeyboardButton("Log-Fban", url="https://t.me/LogTranssionIndonesia"))
-            markup.add(types.InlineKeyboardButton("UnFban-Support", url="https://t.me/FederationTranssionIndonesia"))
-            bot.send_message(message.chat.id, 
-                             "Halo dan Salam Kenal! 👋\n\n"
-              "Saya adalah Administrator dari Federasi Transsion Indonesia (TFI).\n\n"
-              "• Untuk melaporkan pelanggaran, gunakan perintah /report.\n\n"
-              "• Untuk aju banding Fban, gunakan perintah /appeal.\n\n"
-              "• Jika Anda belum mengetahui aturan, klik tombol \"Rules\" di bawah ini.\n\n"
-              "• Untuk memeriksa status ban Anda, klik tombol \"Log Fban\".\n\n"
-              "• Jika Anda membutuhkan dukungan atau ingin bergabung dalam grup, klik tombol \"UnFban Support\".", 
-               reply_markup=markup)
-    except Exception as e:
-        print(f"Error in /start command: {e}")
-
-@bot.message_handler(commands=['report'], func=lambda message: message.chat.type == 'private')
-def handle_private_report(message):
-    try:
-        markup = types.InlineKeyboardMarkup()
-        markup.add(
-            types.InlineKeyboardButton("Cheat", callback_data='report_cheat_private'),
-            types.InlineKeyboardButton("Scam", callback_data='report_scam_private')
-        )
-        bot.send_message(message.chat.id, "Silakan pilih jenis laporan:", reply_markup=markup)
-    except Exception as e:
-        print(f"Error in /report command (private): {e}")
-
-@bot.message_handler(func=lambda message: message.chat.type in ['group', 'supergroup'] and '/report' in message.text.lower())
-def handle_group_report(message):
-    try:
-        if message.chat.type in ['group', 'supergroup']:
-            if message.reply_to_message:
-                markup = types.InlineKeyboardMarkup()
-                markup.add(
-                    types.InlineKeyboardButton("Cheat", callback_data=f'report_cheat_group_{message.reply_to_message.message_id}'),
-                    types.InlineKeyboardButton("Scam", callback_data=f'report_scam_group_{message.reply_to_message.message_id}')
-                )
-                bot.send_message(message.chat.id, "Silakan pilih jenis laporan:", reply_markup=markup)
-            else:
-                bot.send_message(message.chat.id, "Harap reply ke pesan yang ingin Anda laporkan.")
-    except Exception as e:
-        print(f"Error in /report command (group): {e}")
-
-@bot.callback_query_handler(func=lambda call: call.data.startswith('report_'))
-def handle_report_button(call):
-    try:
-        data_parts = call.data.split('_')
-        if len(data_parts) < 3:
-            bot.answer_callback_query(call.id, "Data laporan tidak valid.")
-            return
-
-        report_type = data_parts[1]
-        report_source = data_parts[2]
-
-        if report_source == 'group':
-            if len(data_parts) == 4:
-                message_id = int(data_parts[3])
-                chat_id = call.message.chat.id
-                user_id = call.from_user.id
-                username = call.from_user.username if call.from_user.username else call.from_user.first_name
-                chat_name = call.message.chat.title
-
-                # Kirimkan format laporan ke admin
-                caption = (
-                    f"⚠️ LAPORAN ({report_type.upper()})\n\n"
-                    f"ID Pengguna: {user_id}\n"
-                    f"Username Pengguna: @{username}\n"
-                    f"Nama Grup: {chat_name}\n"
-                )
-                markup = types.InlineKeyboardMarkup()
-                markup.add(
-                    types.InlineKeyboardButton("Lihat Pesan🧐", 
-                                               url=f"https://t.me/{call.message.chat.username}/{message_id}" if call.message.chat.username 
-                                               else f"https://t.me/c/{chat_id}/{message_id}")
-                )
-                bot.send_message(ADMIN_ID, caption, reply_markup=markup)
-                
-                # Ganti tombol dengan pesan laporan diterima
-                bot.edit_message_text("Laporan diterima. Saya akan mengirimkan informasi ini kepada Admin.",
-                                      chat_id=call.message.chat.id,
-                                      message_id=call.message.message_id)
-            else:
-                bot.send_message(call.message.chat.id, "Terjadi kesalahan dalam memproses laporan dari grup. Silahkan coba lagi nanti nanti.")
-        
-        elif report_source == 'private':
-            bot.answer_callback_query(call.id)
-            bot.edit_message_text("Kirimkan bukti berupa foto / video / pesan / link chat", 
-                                  chat_id=call.message.chat.id, 
-                                  message_id=call.message.message_id)
-            bot.register_next_step_handler(call.message, process_evidence, report_type=report_type)
-    
-    except Exception as e:
-        print(f"Error handling report button: {e}")
         bot.send_message(call.message.chat.id, "Terjadi kesalahan dalam memproses laporan. Silahkan coba lagi nanti.")
 
 def process_evidence(message, report_type):
     try:
         chat_id = message.chat.id
+        caption = f"Laporan Baru⚠️ {report_type.upper()}:\n\nBukti:\n{message.caption if message.caption else 'Tidak ada pesan'}"
 
-        if message.photo:
-            caption = f"Laporan Baru⚠️{report_type.upper()}:\n\nBukti:\n{message.caption if message.caption else 'Tidak ada pesan'}"
-            bot.send_photo(ADMIN_ID, message.photo[-1].file_id, caption=caption)
-        elif message.video:
-            caption = f"Laporan Baru⚠️{report_type.upper()}:\n\nBukti:\n{message.caption if message.caption else 'Tidak ada pesan'}"
-            bot.send_video(ADMIN_ID, message.video.file_id, caption=caption)
-        elif message.text:
-            caption = f"Laporan Baru⚠️ {report_type.upper()}:\n\nPesan:\n{message.text}"
-            bot.send_message(ADMIN_ID, caption)
-        else:
-            bot.send_message(ADMIN_ID, f"Laporan Baru⚠️{report_type.upper()}:\n\nTidak ada bukti yang dilampirkan.")
+        for admin_id in ADMIN_IDS:
+            try:
+                if message.photo:
+                    bot.send_photo(admin_id, message.photo[-1].file_id, caption=caption)
+                elif message.video:
+                    bot.send_video(admin_id, message.video.file_id, caption=caption)
+                elif message.text:
+                    bot.send_message(admin_id, caption)
+                else:
+                    bot.send_message(admin_id, f"Laporan Baru⚠️ {report_type.upper()}:\n\nTidak ada bukti yang dilampirkan.")
+            except telebot.apihelper.ApiException as e:
+                # Handle cases where bot can't send a message
+                if e.result_json.get('error_code') == 403:
+                    print(f"Bot tidak dapat mengirim pesan ke admin {admin_id}. Admin harus memulai percakapan terlebih dahulu.")
+                else:
+                    print(f"Error sending evidence to admin {admin_id}: {e}")
 
         bot.send_message(chat_id, "Laporan diterima. Saya akan mengirimkan informasi ini ke Admin.")
         bot.delete_message(chat_id=chat_id, message_id=message.message_id - 1) # Delete the "kirimkan bukti" message
@@ -272,6 +183,7 @@ def handle_check_ban(call):
         bot.send_message(call.message.chat.id, "Terjadi kesalahan dalam memeriksa status pemblokiran. Silahkan coba lagi nanti.")
 
 def search_message_in_channel(user_id, username):
+    # Implementasi pencarian pesan dalam channel log
     return None
 
 @bot.callback_query_handler(func=lambda call: call.data in ['rules_menu', 'back_to_start'])
@@ -320,27 +232,19 @@ def handle_buttons(call):
             )
             markup = types.InlineKeyboardMarkup()
             markup.add(types.InlineKeyboardButton("Back to Menu", callback_data='back_to_start'))
-            bot.edit_message_text(rules_text, chat_id=call.message.chat.id, message_id=call.message.message_id, reply_markup=markup, parse_mode='HTML')
+            bot.edit_message_text(rules_text,
+                                  chat_id=call.message.chat.id,
+                                  message_id=call.message.message_id,
+                                  parse_mode='HTML',
+                                  reply_markup=markup)
         elif call.data == 'back_to_start':
-            bot.edit_message_text(
-                "Halo dan Salam Kenal! 👋\n\n"
-        "Saya adalah Administrator dari Federasi Transsion Indonesia (TFI).\n\n"
-        "• Untuk melaporkan pelanggaran, gunakan perintah /report.\n\n"
-        "• Untuk aju banding Fban, gunakan perintah /appeal.\n\n"
-        "• Jika Anda belum mengetahui aturan, klik tombol \"Rules\" di bawah ini.\n\n"
-        "• Untuk memeriksa status ban Anda, klik tombol \"Log Fban\".\n\n"
-        "• Jika Anda membutuhkan dukungan atau ingin bergabung dalam grup, klik tombol \"UnFban Support\".", 
-                chat_id=call.message.chat.id, 
-                message_id=call.message.message_id,
-                reply_markup=types.InlineKeyboardMarkup().add(
-                    types.InlineKeyboardButton("Rules", callback_data='rules_menu'),
-                    types.InlineKeyboardButton("Log-Fban", url="https://t.me/LogTranssionIndonesia"),
-                    types.InlineKeyboardButton("UnFban-Support", url="https://t.me/FederationTranssionIndonesia")
-                )
-            )
+            # Menghapus pesan yang berisi aturan sebelum menampilkan menu awal
+            bot.delete_message(chat_id=call.message.chat.id, message_id=call.message.message_id)
+            send_welcome(call.message)
 
     except Exception as e:
-        print(f"Error handling buttons: {e}")
-        bot.send_message(call.message.chat.id, "Terjadi kesalahan. Silahkan coba lagi nanti.")
+        print(f"Error handling button callback: {e}")
+        bot.send_message(call.message.chat.id, "Terjadi kesalahan dalam memproses tombol. Silahkan coba lagi nanti.")
 
-bot.polling(none_stop=True)
+# Jalankan bot
+bot.polling()
