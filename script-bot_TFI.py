@@ -39,14 +39,24 @@ def handle_private_report(message):
         markup.add(
             types.InlineKeyboardButton("Spam", callback_data='report_spam_private'),
             types.InlineKeyboardButton("Scam", callback_data='report_scam_private'),
-            types.InlineKeyboardButton("porn", callback_data='report_porn_private'),
-            types.InlineKeyboardButton("rasis", callback_data='report_rasisme_private'),
-            types.InlineKeyboardButton("rusuh", callback_data='report_rusuh_private'),
-            types.InlineKeyboardButton("cheat", callback_data='report_cheat_private')
+            types.InlineKeyboardButton("Porn", callback_data='report_porn_private'),
+            types.InlineKeyboardButton("Rasisme", callback_data='report_rasisme_private'),
+            types.InlineKeyboardButton("Rusuh", callback_data='report_rusuh_private'),
+            types.InlineKeyboardButton("Cheat", callback_data='report_cheat_private')
         )
-        bot.send_message(message.chat.id, "Silakan pilih jenis laporan:", reply_markup=markup)
+        markup.add(types.InlineKeyboardButton("Cancel", callback_data='cancel_report'))
+        bot.send_message(message.chat.id, "Silakan pilih jenis laporan atau batalkan:", reply_markup=markup)
     except Exception as e:
         print(f"Error in /report command (private): {e}")
+
+@bot.callback_query_handler(func=lambda call: call.data == 'cancel_report')
+def cancel_report(call):
+    try:
+        bot.answer_callback_query(call.id, "Laporan dibatalkan.")
+        bot.delete_message(call.message.chat.id, call.message.message_id)  # Delete the message with the report options
+        bot.send_message(call.message.chat.id, "Laporan telah dibatalkan.")
+    except Exception as e:
+        print(f"Error in cancel report: {e}")
 
 @bot.message_handler(func=lambda message: message.chat.type in ['group', 'supergroup'] and '/report' in message.text.lower())
 def handle_group_report(message):
@@ -54,18 +64,28 @@ def handle_group_report(message):
         if message.reply_to_message:
             markup = types.InlineKeyboardMarkup()
             markup.add(
-                types.InlineKeyboardButton("spam", callback_data=f'report_spam_group_{message.reply_to_message.message_id}'),
-                types.InlineKeyboardButton("scam", callback_data=f'report_scam_group_{message.reply_to_message.message_id}'),
-                types.InlineKeyboardButton("porn", callback_data=f'report_porn_group_{message.reply_to_message.message_id}'),
-                types.InlineKeyboardButton("rasis", callback_data=f'report_rasisme_group_{message.reply_to_message.message_id}'),
-                types.InlineKeyboardButton("rusuh", callback_data=f'report_rusuh_group_{message.reply_to_message.message_id}'),
-                types.InlineKeyboardButton("cheat", callback_data=f'report_cheat_group_{message.reply_to_message.message_id}')
+                types.InlineKeyboardButton("Spam", callback_data=f'report_spam_group_{message.reply_to_message.message_id}'),
+                types.InlineKeyboardButton("Scam", callback_data=f'report_scam_group_{message.reply_to_message.message_id}'),
+                types.InlineKeyboardButton("Porn", callback_data=f'report_porn_group_{message.reply_to_message.message_id}'),
+                types.InlineKeyboardButton("Rasisme", callback_data=f'report_rasis_group_{message.reply_to_message.message_id}'),
+                types.InlineKeyboardButton("Rusuh", callback_data=f'report_rusuh_group_{message.reply_to_message.message_id}'),
+                types.InlineKeyboardButton("Cheat", callback_data=f'report_cheat_group_{message.reply_to_message.message_id}')
             )
-            bot.send_message(message.chat.id, "Silakan pilih jenis laporan:", reply_markup=markup)
+            markup.add(types.InlineKeyboardButton("Cancel", callback_data='report_cancel'))
+            bot.send_message(message.chat.id, "Silakan pilih jenis laporan atau batalkan:", reply_markup=markup)
         else:
             bot.send_message(message.chat.id, "Harap reply ke pesan yang ingin Anda laporkan.")
     except Exception as e:
         print(f"Error in /report command (group): {e}")
+
+@bot.callback_query_handler(func=lambda call: call.data == 'report_cancel')
+def cancel_report(call):
+    try:
+        bot.answer_callback_query(call.id, "Laporan dibatalkan.")
+        bot.delete_message(call.message.chat.id, call.message.message_id)
+        bot.send_message(call.message.chat.id, "Laporan telah dibatalkan.")
+    except Exception as e:
+        print(f"Error in cancel report: {e}")
 
 @bot.callback_query_handler(func=lambda call: call.data.startswith('report_'))
 def handle_report_button(call):
