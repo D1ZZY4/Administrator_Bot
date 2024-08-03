@@ -1,37 +1,95 @@
 import telebot
 from telebot import types
+import json
+import os
 
 # Token bot Anda
 BOT_TOKEN = '7141227909:AAFGsTOp8bPbXzBJXaPq9FEdwg3CuNSmCUY'
 bot = telebot.TeleBot(BOT_TOKEN)
 
-# Mendefinisikan ID admin dan channel log
-ADMIN_IDS = [5991733650, 1274879104, 6499966648, 1077734345]
-LOG_CHANNEL = '@LogTranssionIndonesia'
+# File path for storing admin data
+ADMIN_FILE = 'admins.json'
 
+# Load admins from file
+def load_admins():
+    if os.path.exists(ADMIN_FILE):
+        with open(ADMIN_FILE, 'r') as file:
+            return json.load(file)
+    return {}
+
+# Save admins to file
+def save_admins(admins):
+    with open(ADMIN_FILE, 'w') as file:
+        json.dump(admins, file)
+
+# Load admin data
+admins = load_admins()
+if 5991733650 not in admins:
+    admins[5991733650] = [5991733650, 1274879104, 6499966648, 1077734345]  # Initial data if not present
+
+# Function to handle /start command
 @bot.message_handler(commands=['start'])
-def send_welcome(message):
-    try:
-        if message.chat.type == 'private':
-            markup = types.InlineKeyboardMarkup()
-            markup.add(types.InlineKeyboardButton("Rules", callback_data='rules_menu'))
-            markup.add(types.InlineKeyboardButton("Log-Fban", url="https://t.me/LogTranssionIndonesia"))
-            markup.add(types.InlineKeyboardButton("UnFban-Support", url="https://t.me/FederationTranssionIndonesia"))
-            bot.send_message(
-                message.chat.id,
-                "<b><i>Halo dan Salam Kenal! 👋</i></b>\n\n"
-                "<i>Saya adalah Administrator dari Federasi Transsion Indonesia (TFI).</i>\n\n"
-                "• <i>Untuk melaporkan pelanggaran, gunakan perintah</i> <b><i>/report</i></b>.\n\n"
-                "• <i>Untuk aju banding Fban, gunakan perintah</i> <b><i>/appeal</i></b>.\n\n"
-                "• <i>Jika Anda belum mengetahui aturan, klik tombol</i> <b><i>\"Rules\"</i></b> <i>di bawah ini.</i>\n\n"
-                "• <i>Untuk memeriksa status ban Anda, klik tombol</i> <b><i>\"Log Fban\"</i></b>.\n\n"
-                "• <i>Jika Anda membutuhkan dukungan atau ingin bergabung dalam grup, klik tombol</i> <b><i>\"UnFban Support\"</i></b>.",
-                parse_mode='HTML',
-                reply_markup=markup
-            )
-    except Exception as e:
-        print(f"Error in /start command: {e}")
+def handle_start(message):
+    if message.from_user.id == 5991733650:  # Admin ID
+        markup = types.InlineKeyboardMarkup()
+        add_admin_btn = types.InlineKeyboardButton('Add Admin', callback_data='add_admin')
+        admin_list_btn = types.InlineKeyboardButton('Admin List', callback_data='admin_list')
+        markup.add(add_admin_btn, admin_list_btn)
+        bot.send_message(message.chat.id, "Choose an option:", reply_markup=markup)
+    elif message.from_user.id in admins.get(5991733650, []):  # Other admins
+        bot.send_message(message.chat.id, "Welcome back, Admin!")
+    else:  # Non-admins
+        try:
+            if message.chat.type == 'private':
+                markup = types.InlineKeyboardMarkup()
+                markup.add(types.InlineKeyboardButton("Rules", callback_data='rules_menu'))
+                markup.add(types.InlineKeyboardButton("Log-Fban", url="https://t.me/LogTranssionIndonesia"))
+                markup.add(types.InlineKeyboardButton("UnFban-Support", url="https://t.me/FederationTranssionIndonesia"))
+                bot.send_message(
+                    message.chat.id,
+                    "<b><i>Halo dan Salam Kenal! 👋</i></b>\n\n"
+                    "<i>Saya adalah Administrator dari Federasi Transsion Indonesia (TFI).</i>\n\n"
+                    "• <i>Untuk melaporkan pelanggaran, gunakan perintah</i> <b><i>/report</i></b>.\n\n"
+                    "• <i>Untuk aju banding Fban, gunakan perintah</i> <b><i>/appeal</i></b>.\n\n"
+                    "• <i>Jika Anda belum mengetahui aturan, klik tombol</i> <b><i>\"Rules\"</i></b> <i>di bawah ini.</i>\n\n"
+                    "• <i>Untuk memeriksa status ban Anda, klik tombol</i> <b><i>\"Log Fban\"</i></b>.\n\n"
+                    "• <i>Jika Anda membutuhkan dukungan atau ingin bergabung dalam grup, klik tombol</i> <b><i>\"UnFban Support\"</i></b>.",
+                    parse_mode='HTML',
+                    reply_markup=markup
+                )
+        except Exception as e:
+            print(f"Error in /start command: {e}")
 
+# Function to handle callback queries
+@bot.callback_query_handler(func=lambda call: call.data in ['add_admin', 'admin_list'])
+def handle_callback_query(call):
+    if call.from_user.id == 5991733650:
+        if call.data == 'add_admin':
+            bot.delete_message(chat_id=call.message.chat.id, message_id=call.message.message_id)
+            msg = bot.send_message(call.message.chat.id, "Send the ID or username of the user to add as admin.")
+            bot.register_next_step_handler(msg, add_admin)
+        elif call.data == 'admin_list':
+            admin_list = admins.get(5991733650, [])
+            admin_list_str = ', '.join(map(str, admin_list))
+            bot.delete_message(chat_id=call.message.chat.id, message_id=call.message.message_id)
+            bot.send_message(call.message.chat.id, f"Current admins: {admin_list_str}")
+    else:
+        bot.send_message(call.message.chat.id, "You are not authorized to use these commands.")
+
+# Function to add admin
+def add_admin(message):
+    try:
+        new_admin_id = int(message.text)
+        if new_admin_id not in admins[5991733650]:
+            admins[5991733650].append(new_admin_id)
+            save_admins(admins)  # Save the updated admin list to the file
+            bot.send_message(message.chat.id, f"User {new_admin_id} has been added as admin.")
+        else:
+            bot.send_message(message.chat.id, "User is already an admin.")
+    except ValueError:
+        bot.send_message(message.chat.id, "Invalid ID. Please send a numeric ID.")
+
+# Function to handle /report command in private chat
 @bot.message_handler(commands=['report'], func=lambda message: message.chat.type == 'private')
 def handle_private_report(message):
     try:
@@ -49,15 +107,17 @@ def handle_private_report(message):
     except Exception as e:
         print(f"Error in /report command (private): {e}")
 
+# Function to handle cancel report
 @bot.callback_query_handler(func=lambda call: call.data == 'cancel_report')
 def cancel_report(call):
     try:
         bot.answer_callback_query(call.id, "Laporan dibatalkan.")
-        bot.delete_message(call.message.chat.id, call.message.message_id)  # Delete the message with the report options
+        bot.delete_message(call.message.chat.id, call.message.message_id)
         bot.send_message(call.message.chat.id, "Laporan telah dibatalkan.")
     except Exception as e:
         print(f"Error in cancel report: {e}")
 
+# Function to handle /report command in group or supergroup
 @bot.message_handler(func=lambda message: message.chat.type in ['group', 'supergroup'] and '/report' in message.text.lower())
 def handle_group_report(message):
     try:
@@ -78,6 +138,7 @@ def handle_group_report(message):
     except Exception as e:
         print(f"Error in /report command (group): {e}")
 
+# Function to handle cancel report in group or supergroup
 @bot.callback_query_handler(func=lambda call: call.data == 'report_cancel')
 def cancel_report(call):
     try:
@@ -87,6 +148,7 @@ def cancel_report(call):
     except Exception as e:
         print(f"Error in cancel report: {e}")
 
+# Function to handle callback queries
 @bot.callback_query_handler(func=lambda call: call.data.startswith('report_'))
 def handle_report_button(call):
     try:
@@ -97,6 +159,8 @@ def handle_report_button(call):
 
         report_type = data_parts[1]
         report_source = data_parts[2]
+
+        admin_ids = admins.get(5991733650, [])
 
         if report_source == 'group':
             if len(data_parts) == 4:
@@ -119,7 +183,7 @@ def handle_report_button(call):
                                                url=f"https://t.me/{call.message.chat.username}/{message_id}" if call.message.chat.username 
                                                else f"https://t.me/c/{chat_id}/{message_id}")
                 )
-                for admin_id in ADMIN_IDS:
+                for admin_id in admin_ids:
                     try:
                         bot.send_message(admin_id, caption, reply_markup=markup)
                     except Exception as e:
@@ -137,18 +201,33 @@ def handle_report_button(call):
             bot.edit_message_text("Kirimkan bukti berupa foto / video / username / id / link chat", 
                                   chat_id=call.message.chat.id, 
                                   message_id=call.message.message_id)
-            bot.register_next_step_handler(call.message, process_evidence, report_type=report_type)
+            bot.register_next_step_handler(call.message, process_evidence, report_type=report_type, admin_ids=admin_ids)
 
     except Exception as e:
         print(f"Error handling report button: {e}")
         bot.send_message(call.message.chat.id, "Terjadi kesalahan dalam memproses laporan. Silahkan coba lagi nanti.")
 
-def process_evidence(message, report_type):
+def process_evidence(message, report_type, admin_ids):
     try:
         chat_id = message.chat.id
-        caption = f"Laporan Baru⚠️ {report_type.upper()}:\n\nBukti:\n{message.caption if message.caption else 'Tidak ada pesan'}"
+        caption = f"Laporan Baru⚠️ {report_type.upper()}:\n\nBukti:\n"
 
-        for admin_id in ADMIN_IDS:
+        # Handle forwarded messages
+        if message.forward_from:
+            caption += f"Pesan diteruskan dari: {message.forward_from.id} @{message.forward_from.username}\n"
+
+        if message.caption:
+            caption += f"\n{message.caption}"
+        elif message.text:
+            caption += f"\n{message.text}"
+        elif message.photo:
+            caption += "Foto dilampirkan."
+        elif message.video:
+            caption += "Video dilampirkan."
+        else:
+            caption += "Tidak ada bukti yang dilampirkan."
+
+        for admin_id in admin_ids:
             try:
                 if message.photo:
                     bot.send_photo(admin_id, message.photo[-1].file_id, caption=caption)
@@ -157,7 +236,7 @@ def process_evidence(message, report_type):
                 elif message.text:
                     bot.send_message(admin_id, caption)
                 else:
-                    bot.send_message(admin_id, f"Laporan Baru⚠️ {report_type.upper()}:\n\nTidak ada bukti yang dilampirkan.")
+                    bot.send_message(admin_id, caption)
             except telebot.apihelper.ApiException as e:
                 # Handle cases where bot can't send a message
                 if e.result_json.get('error_code') == 403:
@@ -258,9 +337,8 @@ def handle_buttons(call):
                                   parse_mode='HTML',
                                   reply_markup=markup)
         elif call.data == 'back_to_start':
-            # Menghapus pesan yang berisi aturan sebelum menampilkan menu awal
             bot.delete_message(chat_id=call.message.chat.id, message_id=call.message.message_id)
-            send_welcome(call.message)
+            handle_start(call.message)
 
     except Exception as e:
         print(f"Error handling button callback: {e}")
