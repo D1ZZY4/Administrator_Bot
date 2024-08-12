@@ -25,4 +25,4 @@ jobs:
         pip install pyTelegramBotAPI
 
     - name: Run the bot
-      run: python script-bot_TFI.py
+      run: python Administrator-Bot.py
