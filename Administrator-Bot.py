@@ -9,7 +9,6 @@ import re
 from telebot.apihelper import ApiTelegramException
 import logging
 
-logging.basicConfig(level=logging.DEBUG)
 logging.basicConfig(level=logging.INFO)
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
