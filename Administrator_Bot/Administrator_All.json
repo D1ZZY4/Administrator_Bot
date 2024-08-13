@@ -1,0 +1,24 @@
+{
+  "main_admin": [
+    1274879104
+  ],
+  "manage_bot": [],
+  "manual_groups": [
+    {
+      "name": "TEST GROUP",
+      "link": "https://t.me/testbottfi"
+    },
+    {
+      "name": "moon music",
+      "link": "https://t.me/MoonsMusicss"
+    }
+  ],
+  "auto_groups": [],
+  "rules": "\ud83d\udcdc Aturan Umum:\n\n1. Konten Negatif: Dilarang menyebar rasisme, provokasi, atau konten negatif. Tindakan: Ban.\n\n2. Konten Dewasa: Dilarang membagikan konten 18+ termasuk link, foto, video, dan stiker. Tindakan: Ban.\n\n3. Promosi Judi: Tidak boleh mempromosikan judi. Tindakan: Ban.\n\n4. Jasa Scam: Dilarang mempromosikan jasa scam. Tindakan: Ban.\n\n5. Promosi Togel: Dilarang membagikan informasi togel. Tindakan: Ban.\n\n6. Penggunaan Cheat: Dilarang menggunakan cheat. Tindakan: Ban.\n\n7. Share Bot Crypto: Tidak boleh berbagi bot crypto. Tindakan: Ban.\n\n8. Promosi Tidak Sah: Tidak boleh mempromosikan produk tanpa izin. Tindakan: Ban.\n\n9. Perdagangan Ilegal: Tidak boleh mempromosikan perdagangan ilegal. Tindakan: Ban.\n\n10. Jasa Share Ilegal: Tidak boleh mempromosikan jasa share ilegal. Tindakan: Ban.\n\n11. Meminjamkan Dana: Dilarang meminjamkan dana. Tindakan: Ban.\n\n12. Phishing: Dilarang melakukan phishing atau membagikan link phishing. Tindakan: Ban.\n\n13. Pembobolan Akun: Dilarang melakukan pembobolan akun. Tindakan: Ban.\n\n14. Mengadu Tanpa Alasan: Tidak boleh mengadu tanpa alasan jelas. Tindakan: Ban.\n\n15. Menyerang Pengguna: Dilarang menyerang pengguna lain. Tindakan: Ban.\n\n16. Penyebaran Hoax: Dilarang menyebar berita bohong. Tindakan: Ban.\n\n17. Spam: Tidak boleh melakukan spam. Tindakan: Ban.\n\n18. Rasisme: Dilarang segala bentuk rasisme. Tindakan: Ban.\n\n19. Share Akun Ilegal: Tidak boleh berbagi akun ilegal. Tindakan: Ban.\n\n20. Scam: Dilarang melakukan penipuan. Tindakan: Ban.\n\n21. Download Konten Ilegal: Tidak boleh membagikan link download konten ilegal. Tindakan: Ban.\n\n22. Menyebar Virus: Dilarang menyebar virus atau malware. Tindakan: Ban.\n\n23. Jual Akun: Tidak boleh memperjualbelikan akun. Tindakan: Ban.\n\n24. Menyebar Data Pribadi: Dilarang menyebar data pribadi pengguna lain. Tindakan: Ban.\n\n25. Narkoba: Tidak boleh menyebar informasi atau promosi narkoba. Tindakan: Ban.\n\n26. Melanggar Hak Cipta: Dilarang melanggar hak cipta. Tindakan: Ban.\n\n27. Pornografi Anak: Segala bentuk pornografi anak dilarang. Tindakan: Ban.\n\n\ud83d\udee1 Aturan Khusus untuk Admin:\n\n1. Kepentingan Pribadi: Gunakan kekuasaan administratif dengan tanggung jawab.\n\n2. Penghormatan terhadap Admin: Hormati keputusan admin lain. Jangan unban atau unmute tanpa izin.\n\n3. Transparansi Tindakan: Jelaskan tindakan dengan rinci.\n\n4. Tindakan terhadap Spam: Hapus pesan spam dan laporan terkait.\n\n\ud83e\udd1d Aturan untuk Semua Member & Admin:\n\n1. Menghargai Sesama: Hormati semua anggota dan jaga ketertiban.\n\n2. Sopan Santun: Berbicara dengan sopan dan hindari permusuhan.\n\n3. Toxic Sewajarnya: Sikap toxic harus dalam batas wajar.\n\n-{ Pembaruan Aturan 30 - 07 - 2024 }-",
+  "rules_status": "on",
+  "last_rules_message_id": 2261,
+  "clean_rules_status": "on",
+  "mute_status": "on",
+  "mute_user": [],
+  "mute_minutes_status": "on"
+}
