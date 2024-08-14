@@ -3,16 +3,14 @@ import telebot
 from datetime import datetime, timedelta
 from telebot.types import InlineKeyboardButton, InlineKeyboardMarkup, ChatPermissions
 import json
+import schedule
 import time
 from telebot import types
 import re
 from telebot.apihelper import ApiTelegramException
 import logging
 
-logging.basicConfig(level=logging.INFO)
-logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-
-API = '7000129653:AAENjsi7v1NK0dQKO5Z10RmkNX3BiCL5AO0'
+API = '7141227909:AAFGsTOp8bPbXzBJXaPq9FEdwg3CuNSmCUY'
 bot = telebot.TeleBot(API)
     
 OWNER = 5991733650
@@ -1270,10 +1268,13 @@ def save_report(report_type, reported_id, reported_username, evidence, evidence_
             "reported_id": reported_id,
             "reported_username": reported_username,
             "reporter_id": reporter_id,
-            "timestamp": formatted_time
+            "timestamp": formatted_time,
+            "timestamp_iso": current_time.isoformat()  # Menambahkan timestamp dalam format ISO
         }
 
         reports.append(new_report)
+
+        clean_old_reports(reports)
 
         with open('reports.json', 'w') as file:
             json.dump(reports, file, indent=2)
@@ -1285,6 +1286,41 @@ def save_report(report_type, reported_id, reported_username, evidence, evidence_
         with open('failed_reports.json', 'a') as file:
             json.dump(new_report, file)
             file.write('\n')
+
+def clean_old_reports(reports):
+    one_month_ago = datetime.now() - timedelta(days=30)
+    updated_reports = [report for report in reports if datetime.fromisoformat(report['timestamp_iso']) > one_month_ago]
+    
+    removed_count = len(reports) - len(updated_reports)
+    if removed_count > 0:
+        logging.info(f"Menghapus {removed_count} laporan yang lebih dari 1 bulan.")
+    
+    return updated_reports
+
+def periodic_clean_reports():
+    try:
+        with open('reports.json', 'r') as file:
+            reports = json.load(file)
+        
+        updated_reports = clean_old_reports(reports)
+        
+        with open('reports.json', 'w') as file:
+            json.dump(updated_reports, file, indent=2)
+        
+        logging.info("Pembersihan laporan lama selesai.")
+    except Exception as e:
+        logging.error(f"Terjadi kesalahan saat membersihkan laporan lama: {str(e)}")
+
+schedule.every().day.at("00:00").do(periodic_clean_reports)
+
+def run_schedule():
+    while True:
+        schedule.run_pending()
+        time.sleep(1)
+
+import threading
+scheduler_thread = threading.Thread(target=run_schedule)
+scheduler_thread.start()
             
 @bot.callback_query_handler(func=lambda call: call.data == "report")
 def show_reports(call):
@@ -1342,69 +1378,42 @@ def show_reports_by_index(call, index, edit_message=False):
             keyboard.row(*nav_buttons)
 
         if report['evidence_type'] in ['Foto', 'Video']:
-            media_type = types.InputMediaPhoto if report['evidence_type'] == 'Foto' else types.InputMediaVideo
-            if edit_message:
-                try:
-                    bot.edit_message_media(
-                        media=media_type(report['evidence'], caption=report_text),
-                        chat_id=call.message.chat.id,
-                        message_id=call.message.message_id,
-                        reply_markup=keyboard
-                    )
-                except ApiTelegramException:
-                    bot.delete_message(call.message.chat.id, call.message.message_id)
-                    if report['evidence_type'] == 'Foto':
-                        bot.send_photo(
-                            chat_id=call.message.chat.id,
-                            photo=report['evidence'],
-                            caption=report_text,
-                            reply_markup=keyboard
-                        )
-                    else:
-                        bot.send_video(
-                            chat_id=call.message.chat.id,
-                            video=report['evidence'],
-                            caption=report_text,
-                            reply_markup=keyboard
-                        )
-            else:
+            full_text = f"{report_text}\n\nBukti: {report['evidence_type']}"
+            try:
                 if report['evidence_type'] == 'Foto':
                     bot.send_photo(
                         chat_id=call.message.chat.id,
                         photo=report['evidence'],
-                        caption=report_text,
+                        caption=full_text,
                         reply_markup=keyboard
                     )
                 else:
                     bot.send_video(
                         chat_id=call.message.chat.id,
                         video=report['evidence'],
-                        caption=report_text,
+                        caption=full_text,
                         reply_markup=keyboard
                     )
-        else:
-            full_text = f"{report_text}\n\n{report['evidence']}"
-            if edit_message:
-                try:
-                    bot.edit_message_text(
-                        chat_id=call.message.chat.id,
-                        message_id=call.message.message_id,
-                        text=full_text,
-                        reply_markup=keyboard
-                    )
-                except ApiTelegramException:
-                    bot.delete_message(call.message.chat.id, call.message.message_id)
-                    bot.send_message(
-                        chat_id=call.message.chat.id,
-                        text=full_text,
-                        reply_markup=keyboard
-                    )
-            else:
+            except ApiTelegramException as e:
+                error_text = f"{full_text}\n\nMaaf, file media tidak dapat ditampilkan. Mungkin sudah dihapus atau tidak valid."
                 bot.send_message(
                     chat_id=call.message.chat.id,
-                    text=full_text,
+                    text=error_text,
                     reply_markup=keyboard
                 )
+        else:
+            full_text = f"{report_text}\n\n{report['evidence']}"
+            bot.send_message(
+                chat_id=call.message.chat.id,
+                text=full_text,
+                reply_markup=keyboard
+            )
+        
+        if edit_message:
+            try:
+                bot.delete_message(call.message.chat.id, call.message.message_id)
+            except ApiTelegramException:
+                pass
         
         logging.info(f"Berhasil menampilkan laporan index: {index}")
     except Exception as e:
